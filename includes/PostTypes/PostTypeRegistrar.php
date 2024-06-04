@@ -1,8 +1,11 @@
 <?php
+/**
+ * Post type registrar
+ *
+ * @package LudioLabs\IcalFeedSync
+ */
 
-namespace LudioLabs\GoogleCalendarSync\PostTypes;
-
-if ( !defined( 'ABSPATH' ) ) exit;
+namespace LudioLabs\IcalFeedSync\PostTypes;
 
 /**
  * Post type registrar
@@ -11,12 +14,15 @@ class PostTypeRegistrar {
 
 	/**
 	 * Post types
+	 *
 	 * @var array
 	 */
 	protected $items = [];
 
 	/**
 	 * Constructor
+	 *
+	 * @param array $items Items to register.
 	 */
 	public function __construct( $items = array() ) {
 		$this->items = $items;
@@ -24,7 +30,8 @@ class PostTypeRegistrar {
 
 	/**
 	 * Add an item
-	 * @param Post_Type_Base $item
+	 *
+	 * @param PostTypeBase $item Item to add.
 	 */
 	public function add_item( PostTypeBase $item ) {
 		$this->items[] = $item;
@@ -32,8 +39,9 @@ class PostTypeRegistrar {
 
 	/**
 	 * Register post types
+	 *
 	 * @return void
-	 * @throws \Exception
+	 * @throws \Exception If class does not exist.
 	 */
 	public function register_post_types() {
 		foreach ( $this->items as $item ) {
@@ -44,10 +52,11 @@ class PostTypeRegistrar {
 
 	/**
 	 * Register
+	 *
 	 * @return void
+	 * @throws \Exception If class does not exist.
 	 */
 	public function register() {
 		$this->register_post_types();
 	}
-
 }

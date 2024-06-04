@@ -1,14 +1,29 @@
 <?php
-namespace LudioLabs\GoogleCalendarSync\PostTypes;
+/**
+ * iCal Feed post type
+ *
+ * @package LudioLabs\IcalFeedSync
+ */
 
+namespace LudioLabs\IcalFeedSync\PostTypes;
+
+/**
+ * iCal Feed post type
+ */
 class IcalFeed extends PostTypeBase {
 
 	/**
 	 * Post type name
+	 *
 	 * @var string
 	 */
-	protected $post_type = 'gcs_ical_feed';
+	protected $post_type = 'ifs_ical_feed';
 
+	/**
+	 * Post type configuration
+	 *
+	 * @return array
+	 */
 	protected function config() {
 		$config = array(
 			'labels' => array(
@@ -24,48 +39,66 @@ class IcalFeed extends PostTypeBase {
 				'not_found' => 'No GCS iCal Feeds found',
 				'not_found_in_trash' => 'No GCS iCal Feeds found in Trash',
 				'parent_item_colon' => '',
-				'menu_name' => 'GCS iCal Feeds'
+				'menu_name' => 'GCS iCal Feeds',
 			),
 			'public' => true,
 			'publicly_queryable' => true,
 			'show_ui' => true,
 			'show_in_menu' => true,
 			'query_var' => true,
-			'rewrite' => array( 'slug' => 'gcs_ical_feed' ),
+			'rewrite' => array( 'slug' => 'ifs_ical_feed' ),
 			'capability_type' => 'post',
 			'has_archive' => true,
 			'hierarchical' => false,
-			'supports' => array( 'title', ),
+			'supports' => array( 'title' ),
 			'menu_position' => 5,
-			'menu_icon' => 'dashicons-calendar-alt'
+			'menu_icon' => 'dashicons-calendar-alt',
+			'show_in_rest' => true,
 		);
 
 		return $config;
 	}
 
-	public function get_meta_fields() {
+	/**
+	 * Get the meta fields for this post type
+	 *
+	 * @return array[]
+	 */
+	public static function get_meta_fields(): array {
 		return array(
-			'gcs_ical_url' => array(
+			'ifs_ical_url' => array(
 				'label' => 'iCal URL',
 				'type' => 'text',
-				'description' => 'The URL of the iCal feed to sync with.'
+				'description' => 'The URL of the iCal feed to sync with.',
+				'validation' => 'url',
 			),
-			'gcs_ical_secret' => array(
-				'label' => 'Secret',
-				'type' => 'text',
-				'description' => 'The secret key to use when syncing the iCal feed.'
-			),
-			'gcs_sync_last_run' => array(
+			'ifs_sync_last_run' => array(
 				'label' => 'Last Sync',
 				'type' => 'text',
-				'description' => 'The last time the iCal feed was synced.'
+				'description' => 'The last time the iCal feed was synced.',
+				'readonly' => true,
 			),
-			'gcs_sync_next_run' => array(
-				'label' => 'Next Sync',
-				'type' => 'text',
-				'description' => 'The next time the iCal feed will be synced.'
-			)
 		);
+	}
+
+	/**
+	 * Get the iCal URL for a post
+	 *
+	 * @param int $post_id Post ID
+	 * @return string
+	 */
+	public static function get_ical_url( $post_id ) {
+		return get_post_meta( $post_id, 'ifs_ical_url', true );
+	}
+
+	/**
+	 * Get the last sync time for a post
+	 *
+	 * @param int $post_id Post ID
+	 * @return string
+	 */
+	public static function get_last_sync( $post_id ) {
+		return get_post_meta( $post_id, 'ifs_sync_last_run', true );
 	}
 
 }

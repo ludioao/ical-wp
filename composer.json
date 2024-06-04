@@ -2,7 +2,7 @@
     "name": "ludioao/google-calendar-sync",
     "autoload": {
         "psr-4": {
-            "LudioLabs\\GoogleCalendarSync\\": "includes/"
+            "LudioLabs\\IcalFeedSync\\": "includes/"
         }
     },
     "authors": [
@@ -12,12 +12,19 @@
         }
     ],
     "require": {
-        "php": ">=8.0"
+        "php": ">=8.0",
+        "sabre/vobject": "^4.0"
+    },
+    "scripts": {
+        "lint": "./vendor/bin/phpcs --standard=10up-Default --extensions=php --warning-severity=8 -s --runtime-set testVersion 7.4 .",
+        "phpcbf": "./vendor/bin/phpcbf --standard=10up-Default --extensions=php --warning-severity=8 -s --runtime-set testVersion 7.4 .",
+        "test": "phpunit ",
+        "phpcompatibility": "phpcs --standard=PHPCompatibilityWP"
     },
     "require-dev": {
-        "10up/phpcs-composer": "dev-master",
+        "10up/phpcs-composer": "^3.0",
         "10up/wp_mock": "^0.4.2",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6",
         "phpcompatibility/phpcompatibility-wp": "*"
     },
     "config": {

@@ -1,34 +1,42 @@
 <?php
+/**
+ * Post type for iCal feeds
+ *
+ * @package LudioLabs\IcalFeedSync
+ */
 
-namespace LudioLabs\GoogleCalendarSync\PostTypes;
+namespace LudioLabs\IcalFeedSync\PostTypes;
 
-use \add_meta_box;
+use function add_meta_box;
 
+/**
+ * Post type for iCal feeds
+ */
 abstract class PostTypeBase {
 
 	/**
 	 * Post type name
+	 *
 	 * @var string
-
 	 */
 	protected $post_type;
 
 	/**
 	 * Post type arguments - see https://developer.wordpress.org/reference/functions/register_post_type/
+	 *
 	 * @var array
 	 */
 	protected $args;
 
 	/**
 	 * Meta fields
+	 *
 	 * @var array
 	 */
 	protected $meta_fields = array();
 
 	/**
 	 * Constructor
-	 * @param string $post_type
-	 * @param array $args
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
@@ -36,12 +44,14 @@ abstract class PostTypeBase {
 
 	/**
 	 * Post type configuration
+	 *
 	 * @return array
 	 */
 	abstract protected function config();
 
 	/**
 	 * Register the post type
+	 *
 	 * @return void
 	 */
 	public function register_post_type() {
@@ -54,80 +64,80 @@ abstract class PostTypeBase {
 		register_post_type( $this->post_type, $this->args );
 
 		add_action( 'add_meta_boxes', array( $this, 'setup_meta_fields' ) );
+
+		add_action( 'save_post', array( $this, 'save_meta_fields' ) );
+
+		// Check if has admin_columns method
+		if ( method_exists( $this, 'admin_columns' ) ) {
+			add_filter( 'manage_' . $this->post_type . '_posts_columns', array( $this, 'admin_columns' ) );
+			add_action( 'manage_' . $this->post_type . '_posts_custom_column', array( $this, 'admin_columns_content' ), 10, 2 );
+		}
 	}
 
 	/**
 	 * Render meta field
-	 * @param WP_Post $post
-	 * @param array $field
-	 * @return mixed|null
+	 *
+	 * @param WP_Post $post  Post
+	 * @param array   $field Field
+	 * @return mixed|null    Field output
 	 */
 	public function render_meta_field( $post, $field ) {
 		if ( ! isset( $field['id'] ) ) {
 			return null;
 		}
 
-		$output = '';
-
 		$value = get_post_meta( $post->ID, $field['id'], true );
 
-		if ( !isset( $field['type'] ) ) {
-			$field['type'] = 'text';
-		}
+		$read_only = $field['readonly'] ?? false;
 
-		if ( $field['type'] == 'text' ) {
-			$output = '<input type="text" id="gcs_field_'. $field['id'] .'" class="widefat" name="' . $field['id'] . '" value="' . esc_attr( $value ) . '" />';
-		}
+		$attr = wp_parse_args(
+			$field,
+			[
+				'type' => 'text',
+				'label' => '',
+				'description' => '',
+				'options' => [],
+				'readonly' => false,
+			]
+		);
 
-		if ( $field['type'] == 'textarea' ) {
-			$output = '<textarea name="' . $field['id'] . '">' . esc_textarea( $value ) . '</textarea>';
-		}
+		$attr['field_id'] = 'ifs_field_' . $field['id'];
 
-		if ( $field['type'] == 'select' ) {
-			$output = '<select name="' . $field['id'] . '">';
-			foreach ( $field['options'] as $option ) {
-				$output .= '<option value="' . $option['value'] . '" ' . selected( $value, $option['value'], false ) . '>' . $option['label'] . '</option>';
-			}
-			$output .= '</select>';
-		}
-
-		if ( $field['type'] == 'checkbox' ) {
-			$output = '<input type="checkbox" name="' . $field['id'] . '" value="1" ' . checked( $value, 1, false ) . ' />';
-		}
-
-		if ( $field['type'] == 'datetime' ) {
-			$output = '<input type="datetime-local" name="' . $field['id'] . '" value="' . esc_attr( $value ) . '" />';
-		}
+		$output = $this->get_render_input( $attr, $read_only, $value );
 
 		$help_description = '';
-		if ( isset( $field['description'] ) && !empty( $field['description'] ) ) {
-			$help_description = sprintf( '<p class="description">%s</p>', $field['description'] );
+		if ( ! empty( $attr['description'] ) ) {
+			$help_description = sprintf( '<p class="description">%s</p>', $attr['description'] );
 		}
 
-		// Encapsulate the output in a div and label.
-		$output = '<div><label for="gcs_field_'. $field['id'] . '">' . $field['label'] . '</label>' . $output . $help_description .'  </div>';
-
-		return $output;
+		/** Output */
+		return sprintf(
+			'<div><label for="%s">%s</label>%s%s</div>',
+			$attr['field_id'],
+			$attr['label'],
+			$output,
+			$help_description
+		);
 	}
 
 	/**
-	 * Render meta field
-	 * @return mixed|null
+	 * Get the meta fields for the post type
+	 *
+	 * @return array[]
 	 */
-	abstract public function get_meta_fields();
+	abstract public static function get_meta_fields(): array;
 
 	/**
-	 * Render meta field
-	 * @param WP_Post $post
-	 * @param array $field
-	 * @return mixed|null
+	 * Setup meta fields
+	 *
+	 * @return void
 	 */
 	public function setup_meta_fields() {
 		// override in child class
-		$meta_fields = $this->get_meta_fields();
+		$meta_fields = static::get_meta_fields();
 
-		$meta_fields = 	apply_filters(
-			sprintf("%s_meta_fields", $this->post_type),
+		$meta_fields = apply_filters(
+			sprintf( '%s_meta_fields', $this->post_type ),
 			$meta_fields
 		);
 
@@ -143,9 +153,111 @@ abstract class PostTypeBase {
 			$fields_output[] = $this->render_meta_field( $post, $field );
 		}
 
-		\add_meta_box( sprintf(  __("%s Settings") , $this->post_type ), __("Settings"), function() use ($fields_output) {
-			echo implode( $fields_output );
-		}, $this->post_type, 'side', 'default' );
+		\add_meta_box(
+			sprintf( __( '%s Settings' ), $this->post_type ),
+			__( 'Settings' ),
+			function () use ( $fields_output ) {
+				echo implode( $fields_output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			},
+			$this->post_type,
+			'normal',
+			'default'
+		);
+	}
+
+	/**
+	 * Save meta fields
+	 *
+	 * @param int $post_id  Post ID
+	 * @return void
+	 */
+	public function save_meta_fields( $post_id ) {
+		$meta_fields = static::get_meta_fields();
+
+		if ( ! count( $meta_fields ) ) {
+			return;
+		}
+
+		foreach ( $meta_fields as $field_id => $field ) {
+			if ( ! isset( $_POST[ $field_id ] ) ) {
+				continue;
+			}
+
+			$value = sanitize_text_field( wp_unslash( $_POST[ $field_id ] ) );
+
+			// If it is a URL, then url encode it if it is not already
+			if ( 'url' === $field['validation'] ) {
+				$value = esc_url( wp_unslash( $_POST[ $field_id ] ) );
+			}
+
+			update_post_meta( $post_id, $field_id, $value );
+		}
+	}
+
+	/**
+	 * Get the input field
+	 *
+	 * @param  array $attr      attributes
+	 * @param  mixed $read_only is readonly?
+	 * @param  mixed $value     value
+	 *
+	 * @return string
+	 */
+	public function get_render_input( array $attr, mixed $read_only, mixed $value ): string {
+		if ( 'textarea' === $attr['type'] ) {
+			$output = sprintf(
+				'<textarea id="%s" class="widefat" name="%s" %s>%s</textarea>',
+				$attr['field_id'],
+				$attr['id'],
+				$read_only ? 'readonly' : '',
+				esc_textarea( $value )
+			);
+		} elseif ( 'select' === $attr['type'] ) {
+			$output = sprintf(
+				'<select id="%s" name="%s" %s>',
+				$attr['field_id'],
+				$attr['id'],
+				$read_only ? 'readonly' : ''
+			);
+
+			foreach ( $attr['options'] as $option ) {
+				$output .= sprintf(
+					'<option value="%s" %s>%s</option>',
+					$option['value'],
+					selected( $value, $option['value'], false ),
+					$option['label']
+				);
+			}
+
+			$output .= '</select>';
+		} elseif ( 'checkbox' === $attr['type'] ) {
+			$output = sprintf(
+				'<input type="checkbox" id="%s" name="%s" value="1" %s %s />',
+				$attr['field_id'],
+				$attr['id'],
+				checked( $value, 1, false ),
+				$read_only ? 'readonly' : ''
+			);
+		} elseif ( 'datetime' === $attr['type'] ) {
+			$output = sprintf(
+				'<input type="datetime-local" id="%s" name="%s" value="%s" %s />',
+				$attr['field_id'],
+				$attr['id'],
+				esc_attr( $value ),
+				$read_only ? 'readonly' : ''
+			);
+		} else {
+			$output = sprintf(
+				'<input type="%s" id="%s" class="widefat" name="%s" value="%s" %s />',
+				$attr['type'],
+				$attr['field_id'],
+				$attr['id'],
+				esc_attr( $value ),
+				$read_only ? 'readonly' : ''
+			);
+		}
+
+		return $output;
 	}
 
 }
