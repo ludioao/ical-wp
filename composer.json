@@ -1,0 +1,28 @@
+{
+    "name": "ludioao/google-calendar-sync",
+    "autoload": {
+        "psr-4": {
+            "LudioLabs\\GoogleCalendarSync\\": "includes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Lúdio Oliveira",
+            "email": "ludio.ao@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "10up/phpcs-composer": "dev-master",
+        "10up/wp_mock": "^0.4.2",
+        "phpunit/phpunit": "^9.5",
+        "phpcompatibility/phpcompatibility-wp": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

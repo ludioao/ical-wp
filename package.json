@@ -1,0 +1,45 @@
+{
+  "name": "google-calendar-sync",
+  "version": "1.0.0",
+  "description": "A simple calendar connected to Google Calendar",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "deploy": "npm install && npm run build",
+    "makepot": "wpi18n makepot --domain-path languages --pot-file simple-podcasting.pot --type plugin --main-file simple-podcasting.php --exclude node_modules,tests,docs,vendor",
+    "prebuild": "npm run makepot",
+    "prepare": "husky install",
+    "wp-env": "wp-env",
+    "env:start": "wp-env start",
+    "env:stop": "wp-env stop",
+    "cypress:open": "cypress open --browser chrome --config-file tests/cypress/config.config.js",
+    "cypress:run": "cypress run --browser chrome --config-file tests/cypress/config.config.js"
+  },
+  "lint-staged": {
+    "*.php": [
+      "./vendor/bin/phpcs --standard=10up-Default --extensions=php --warning-severity=8 -s --runtime-set testVersion 7.4"
+    ],
+    "tests/**/*.js": [
+      "./node_modules/.bin/wp-scripts format"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@10up/cypress-wp-utils": "^0.2.0",
+    "@wordpress/env": "^9.2.0",
+    "@wordpress/scripts": "^27.1.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "cypress": "^13.2.0",
+    "cypress-file-upload": "^5.0.8",
+    "cypress-localstorage-commands": "^2.2.4",
+    "cypress-mochawesome-reporter": "^3.6.0",
+    "husky": "^8.0.1",
+    "json-schema": ">=0.4.0",
+    "lint-staged": "^13.0.3",
+    "markdown-it": "^13.0.1",
+    "mochawesome-json-to-md": "^0.7.2",
+    "node-wp-i18n": "^1.2.6",
+    "fullcalendar": "^6.1.13"
+  }
+}
