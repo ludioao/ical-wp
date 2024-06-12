@@ -1,12 +1,12 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "gsc/calendar",
+  "name": "ical-wp/calendar",
   "version": "0.1.0",
-  "title": "Calendar",
+  "title": "iCal Calendar",
   "category": "widgets",
   "icon": "smiley",
-  "description": "Example block scaffolded with Create Block tool.",
+  "description": "Display a calendar with events.",
   "example": {},
   "supports": {
     "html": false

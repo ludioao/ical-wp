@@ -4,15 +4,13 @@
  * @returns {*}
  */
 import {useSelect} from '@wordpress/data';
-import {useMemo} from '@wordpress/element';
 
+export function useFeeds( search, attributes ) {
+	return useSelect( ( select ) => {
 
-export function useCalendar( search, attributes ) {
+		const { getEntityRecords, isResolving, hasFinishedResolution } = select( 'core' );
 
-	const { feed } = attributes;
-
-	const feeds =  useSelect( ( select ) => {
-		const query =  {
+		const query = {
 			per_page: 100,
 			order: "asc",
 			order_by: "menu_order",
@@ -21,29 +19,16 @@ export function useCalendar( search, attributes ) {
 		if ( search ) {
 			query.search = search;
 		}
-
-		const currentFeed = select( 'core' ).getEntityRecord( 'postType', 'gcs_ical_feed', {
-			id: feed,
-		} );
+		const queryParams = [
+			'postType',
+			'ifs_ical_feed',
+			query
+		]
 
 		return {
-			feeds: select( 'core' ).getEntityRecords( 'postType', 'gcs_ical_feed', query ),
-			currentFeed
+			data: getEntityRecords( ...queryParams ),
+			isResolvingData: isResolving( 'getEntityRecords', queryParams ),
+			hasResolvedData: hasFinishedResolution( 'getEntityRecords', queryParams ),
 		};
-	}, [ search ] )
-
-	const options = useMemo( () => {
-		if ( !feeds ) {
-			return [];
-		}
-
-		return feeds.map( ( feed ) => {
-			return {
-				value: feed.id,
-				label: feed.title.rendered || feed.title.raw,
-			}
-		} )
-	}, [feeds] )
-
-	return options;
+	}, [search] )
 }

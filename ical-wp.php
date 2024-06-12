@@ -23,6 +23,9 @@ define( 'IFS_PATH_URL', plugin_dir_url( __FILE__ ) );
 require_once IFS_PATH . '/vendor/autoload.php';
 use LudioLabs\IcalFeedSync\Plugin;
 
+
+Plugin::setup_rest_api();
+
 /**
  * Load the plugin
  *

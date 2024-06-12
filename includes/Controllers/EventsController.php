@@ -7,6 +7,8 @@
 
 namespace LudioLabs\IcalFeedSync\Controllers;
 
+use LudioLabs\IcalFeedSync\PostTypes\Event;
+
 /**
  * Events controller
  */
@@ -26,8 +28,8 @@ class EventsController {
 	 */
 	public function register_routes() {
 		register_rest_route(
-			'ical-feed-sync/v1',
-			'/events',
+			'ical-wp/v1',
+			'/events/(?P<feed_id>\d+)',
 			array(
 				'methods' => 'GET',
 				'callback' => array( $this, 'get_events' ),
@@ -40,12 +42,27 @@ class EventsController {
 	 * Get events
 	 *
 	 * @comment This method is not implemented yet
+	 *
 	 * @param \WP_REST_Request $request the WP_REST_Request object
-	 * @return array
+	 *
+	 * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
 	 */
 	public function get_events( $request ) {
-		// @TODO: Implement this method
-		$events = [];
-		return $events;
+		// get feed id
+		$feed_id = $request->get_param( 'feed_id' );
+
+		$events = Event::get_by_feed_id( $feed_id );
+
+		$response = [];
+
+		foreach ($events as $event) {
+			$response[] = [
+				'title' => $event->post_title,
+				'start' => get_post_meta( $event->ID, 'ifs_event_start', true ),
+				'end' => get_post_meta( $event->ID, 'ifs_event_end', true ),
+			];
+		}
+
+		return rest_ensure_response( $response );
 	}
 }

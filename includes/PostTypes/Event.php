@@ -139,7 +139,7 @@ class Event extends PostTypeBase {
 	public function admin_columns( $columns ) {
 		$columns['ifs_event_start'] = 'Start';
 		$columns['ifs_event_end'] = 'End';
-		$columns['ifs_feed_id'] = 'Feed ID';
+		$columns['ifs_event_feed_id'] = 'Feed ID';
 
 		return $columns;
 	}
@@ -152,7 +152,7 @@ class Event extends PostTypeBase {
 	 */
 	public function admin_columns_content( $column, $post_id ) {
 
-		if ( ! in_array( $column, array( 'ifs_event_start', 'ifs_event_end', 'ifs_feed_id' ) ) ) {
+		if ( ! in_array( $column, array( 'ifs_event_start', 'ifs_event_end', 'ifs_event_feed_id' ) ) ) {
 			return;
 		}
 
@@ -161,11 +161,26 @@ class Event extends PostTypeBase {
 			echo $time ? date( 'Y-m-d H:i ', strtotime( $time ) ) : '';
 		}
 
-		if ( 'ifs_feed_id' === $column ) {
-			$feed_id = get_post_meta( $post_id, 'ifs_feed_id', true );
+		if ( 'ifs_event_feed_id' === $column ) {
+			$feed_id = get_post_meta( $post_id, 'ifs_event_feed_id', true );
 			echo $feed_id ? $feed_id : 'N/A';
 		}
 
+	}
+
+	public static function get_by_feed_id( $feed_id ) {
+		$posts = get_posts( array(
+			'post_type' => 'ifs_event',
+			'posts_per_page' => -1,
+			'meta_query' => array(
+				array(
+					'key' => 'ifs_event_feed_id',
+					'value' => $feed_id,
+				),
+			),
+		) );
+
+		return $posts;
 	}
 
 }

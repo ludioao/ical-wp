@@ -26,7 +26,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/compose */ "@wordpress/compose");
 /* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./editor.scss */ "./blocks/src/calendar/editor.scss");
+/* harmony import */ var _hook__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./hook */ "./blocks/src/calendar/hook.js");
+/* harmony import */ var _wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @wordpress/server-side-render */ "@wordpress/server-side-render");
+/* harmony import */ var _wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./editor.scss */ "./blocks/src/calendar/editor.scss");
 
 /**
  * External dependencies
@@ -35,6 +38,8 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * WordPress dependencies
  */
+
+
 
 
 
@@ -55,18 +60,9 @@ function Edit(props) {
     setAttributes
   } = props;
   const [search, setSearch] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)('');
-  const debouncedSearch = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__.useDebounce)(value => {
-    setSearch(value);
-  }, 500);
-  const feeds = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => {
-    return select('core').getEntityRecords('postType', 'gcs_ical_feed', {
-      per_page: 100,
-      order: "asc",
-      order_by: "menu_order",
-      // search
-      search: search
-    });
-  }, [search]);
+  const {
+    data: feeds
+  } = (0,_hook__WEBPACK_IMPORTED_MODULE_7__.useFeeds)(search, attributes);
   const options = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useMemo)(() => {
     if (!feeds) {
       return [];
@@ -78,25 +74,39 @@ function Edit(props) {
       };
     });
   }, [feeds]);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useEffect)(() => {
-    // Get the feed from attributes.
-    if (!attributes.feed) {
-      return;
-    }
+  const debouncedSearch = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__.useDebounce)(value => {
+    setSearch(value);
+  }, 500);
 
-    // Get the feed from the server.
-    if (!feeds) {
-      return;
-    }
+  //
+  // useEffect( () => {
+  // 	// Get the feed from attributes.
+  // 	if ( !attributes.feed ) {
+  // 		return;
+  // 	}
+  //
+  // 	// Get the feed from the server.
+  // 	if ( !feeds ) {
+  // 		return;
+  // 	}
+  //
+  // 	// Get the feed from the server.
+  // 	// Set search
+  // 	const feed = feeds.find( ( feed ) => feed.id === attributes.feed );
+  //
+  // 	if ( feed ) {
+  // 		setSearch( feed.title.rendered || feed.title.raw );
+  // 	}
+  //
+  // }, [] );
 
-    // Get the feed from the server.
-    // Set search
-    const feed = feeds.find(feed => feed.id === attributes.feed);
-  }, []);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)()
-  }, attributes.feed), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.PanelBody, {
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Calendar Settings')
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)((_wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_8___default()), {
+    block: "ical-wp/calendar",
+    attributes: attributes
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('xCalendar Settings')
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.ComboboxControl, {
     options: options,
     onChange: value => setAttributes({
@@ -106,6 +116,50 @@ function Edit(props) {
       debouncedSearch(value);
     }
   }))));
+}
+
+/***/ }),
+
+/***/ "./blocks/src/calendar/hook.js":
+/*!*************************************!*\
+  !*** ./blocks/src/calendar/hook.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useFeeds: () => (/* binding */ useFeeds)
+/* harmony export */ });
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__);
+/**
+ * External dependencies
+ * @param search
+ * @returns {*}
+ */
+
+function useFeeds(search, attributes) {
+  return (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.useSelect)(select => {
+    const {
+      getEntityRecords,
+      isResolving,
+      hasFinishedResolution
+    } = select('core');
+    const query = {
+      per_page: 100,
+      order: "asc",
+      order_by: "menu_order"
+    };
+    if (search) {
+      query.search = search;
+    }
+    const queryParams = ['postType', 'ifs_ical_feed', query];
+    return {
+      data: getEntityRecords(...queryParams),
+      isResolvingData: isResolving('getEntityRecords', queryParams),
+      hasResolvedData: hasFinishedResolution('getEntityRecords', queryParams)
+    };
+  }, [search]);
 }
 
 /***/ }),
@@ -262,13 +316,23 @@ module.exports = window["wp"]["i18n"];
 
 /***/ }),
 
+/***/ "@wordpress/server-side-render":
+/*!******************************************!*\
+  !*** external ["wp","serverSideRender"] ***!
+  \******************************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["serverSideRender"];
+
+/***/ }),
+
 /***/ "./blocks/src/calendar/block.json":
 /*!****************************************!*\
   !*** ./blocks/src/calendar/block.json ***!
   \****************************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"gsc/calendar","version":"0.1.0","title":"Calendar","category":"widgets","icon":"smiley","description":"Example block scaffolded with Create Block tool.","example":{},"supports":{"html":false},"attributes":{"feed":{"type":"integer","default":0}},"textdomain":"calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"ical-wp/calendar","version":"0.1.0","title":"iCal Calendar","category":"widgets","icon":"smiley","description":"Display a calendar with events.","example":{},"supports":{"html":false},"attributes":{"feed":{"type":"integer","default":0}},"textdomain":"calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
 
 /***/ })
 

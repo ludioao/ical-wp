@@ -24,20 +24,25 @@ final class Plugin {
 	public static function init() {
 		self::post_type_registrar();
 		self::register_block_types();
+		self::setup_cronjob();
+	}
 
-		if( isset($_GET['ludio'])) {
-			// get first ical feed
-			$feed = get_posts([
-				'post_type' => 'ifs_ical_feed',
-				'posts_per_page' => 1,
-			]);
+	/**
+	 * Setup the REST API
+	 *
+	 * @return void
+	 */
+	public static function setup_rest_api() {
+		$events_controller = new Controllers\EventsController();
+	}
 
-			$feed_id = $feed[0]->ID;
-
-			$sync = new CronJob\SyncFeed($feed_id);
-
-			$sync->run();
-		}
+	/**
+	 * Setup the cron job
+	 *
+	 * @return void
+	 */
+	public static function setup_cronjob() {
+		CronJob\Setup::setup();
 	}
 
 	/**

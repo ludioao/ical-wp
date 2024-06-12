@@ -12,6 +12,8 @@ import {useSelect} from '@wordpress/data';
 import {useMemo, useEffect, useState} from '@wordpress/element';
 import {ComboboxControl, PanelBody, SelectControl, Spinner} from "@wordpress/components";
 import { useDebounce } from '@wordpress/compose';
+import {useFeeds} from "./hook";
+import ServerSideRender from "@wordpress/server-side-render";
 
 
 
@@ -27,21 +29,9 @@ export default function Edit( props ) {
 	const {attributes, setAttributes} = props;
 	const [search, setSearch] = useState( '' );
 
-	const debouncedSearch = useDebounce( ( value ) => {
-		setSearch( value );
-	}, 500 )
+	const {data: feeds} = useFeeds( search, attributes );
 
-	const feeds =  useSelect( ( select ) => {
-		return select( 'core' ).getEntityRecords( 'postType', 'gcs_ical_feed', {
-			per_page: 100,
-			order: "asc",
-			order_by: "menu_order",
-			// search
-			search: search,
-		} );
-	}, [ search ] )
-
-	const options = useMemo( () => {
+	const options = useMemo(() => {
 		if ( !feeds ) {
 			return [];
 		}
@@ -50,35 +40,44 @@ export default function Edit( props ) {
 			return {
 				value: feed.id,
 				label: feed.title.rendered || feed.title.raw,
-			}
-		} )
-	}, [feeds] )
+			};
+		} );
+	}, [feeds])
 
-	useEffect( () => {
-		// Get the feed from attributes.
-		if ( !attributes.feed ) {
-			return;
-		}
+	const debouncedSearch = useDebounce( ( value ) => {
+		setSearch( value );
+	}, 500 )
 
-		// Get the feed from the server.
-		if ( !feeds ) {
-			return;
-		}
-
-		// Get the feed from the server.
-		// Set search
-		const feed = feeds.find( ( feed ) => feed.id === attributes.feed );
-
-	}, [] );
+	//
+	// useEffect( () => {
+	// 	// Get the feed from attributes.
+	// 	if ( !attributes.feed ) {
+	// 		return;
+	// 	}
+	//
+	// 	// Get the feed from the server.
+	// 	if ( !feeds ) {
+	// 		return;
+	// 	}
+	//
+	// 	// Get the feed from the server.
+	// 	// Set search
+	// 	const feed = feeds.find( ( feed ) => feed.id === attributes.feed );
+	//
+	// 	if ( feed ) {
+	// 		setSearch( feed.title.rendered || feed.title.raw );
+	// 	}
+	//
+	// }, [] );
 
 	return (
 		<>
 			<div {...useBlockProps()}>
-				{attributes.feed}
+				<ServerSideRender block="ical-wp/calendar" attributes={attributes} />
 			</div>
 
 			<InspectorControls>
-				<PanelBody title={__( 'Calendar Settings' )}>
+				<PanelBody title={__( 'xCalendar Settings' )}>
 
 					<ComboboxControl
 						options={options}

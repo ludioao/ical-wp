@@ -33,20 +33,42 @@ class SyncFeed {
 	}
 
 	/**
+	 * Set transient error
+	 *
+	 * @param $message
+	 *
+	 * @return void
+	 */
+	public function set_transient_error($message) {
+		set_transient(
+			'ifs_sync_feed_error',
+			$message,
+			60 * 5 );
+	}
+
+	/**
 	 * Sync feed
 	 *
 	 * @return void
 	 */
 	public function run() {
+		// Remove transient
+		delete_transient( 'ifs_sync_feed_error' );
+
 		// Get feed URL by feed ID
 		$feed_url = IcalFeed::get_ical_url( $this->feed_id );
+
+		if ( ! $feed_url ) {
+			$this->set_transient_error( __( 'Feed URL not found for: #', 'ical-feed-sync' ) . $this->feed_id );
+			return;
+		}
 
 		$provider = new ICal( $feed_url );
 
 		$events = $provider->get_events();
 
 		if ( is_wp_error( $events ) ) {
-			// Log?
+			$this->set_transient_error( $events->get_error_message() );
 			return;
 		}
 
