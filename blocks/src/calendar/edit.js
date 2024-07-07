@@ -9,15 +9,14 @@
 import {__} from '@wordpress/i18n';
 import {useBlockProps, InspectorControls} from '@wordpress/block-editor';
 import {useSelect} from '@wordpress/data';
-import {useMemo, useEffect, useState} from '@wordpress/element';
+import {useMemo, useEffect, useRef, useState} from '@wordpress/element';
 import {ComboboxControl, PanelBody, SelectControl, Spinner} from "@wordpress/components";
 import { useDebounce } from '@wordpress/compose';
 import {useFeeds} from "./hook";
 import ServerSideRender from "@wordpress/server-side-render";
 
-
-
 import './editor.scss';
+import CalendarView from "./js/CalendarView";
 
 /**
  * Edit -- the block editor
@@ -48,38 +47,17 @@ export default function Edit( props ) {
 		setSearch( value );
 	}, 500 )
 
-	//
-	// useEffect( () => {
-	// 	// Get the feed from attributes.
-	// 	if ( !attributes.feed ) {
-	// 		return;
-	// 	}
-	//
-	// 	// Get the feed from the server.
-	// 	if ( !feeds ) {
-	// 		return;
-	// 	}
-	//
-	// 	// Get the feed from the server.
-	// 	// Set search
-	// 	const feed = feeds.find( ( feed ) => feed.id === attributes.feed );
-	//
-	// 	if ( feed ) {
-	// 		setSearch( feed.title.rendered || feed.title.raw );
-	// 	}
-	//
-	// }, [] );
-
 	return (
 		<>
 			<div {...useBlockProps()}>
-				<ServerSideRender block="ical-wp/calendar" attributes={attributes} />
+				<CalendarView attributes={attributes} />
 			</div>
 
 			<InspectorControls>
-				<PanelBody title={__( 'xCalendar Settings' )}>
+				<PanelBody title={__( 'Calendar Settings' )}>
 
 					<ComboboxControl
+						value={attributes.feed}
 						options={options}
 						onChange={( value ) => setAttributes( {feed: value} )}
 						onFilterValueChange={( value ) => {

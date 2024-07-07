@@ -38,6 +38,10 @@ function ifs_load_plugin() {
 	// Plugin
 	$plugin = new Plugin();
 	$plugin->init();
+
+    if (isset($_GET['ludio'])) {
+        \LudioLabs\IcalFeedSync\CronJob\Setup::run();
+    }
 }
 
 add_action( 'init', 'ifs_load_plugin' );

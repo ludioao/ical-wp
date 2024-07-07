@@ -51,12 +51,17 @@ class EventsController {
 		// get feed id
 		$feed_id = $request->get_param( 'feed_id' );
 
-		$events = Event::get_by_feed_id( $feed_id );
+        $start = $request->get_param( 'start' );
+
+        $end = $request->get_param( 'end' );
+
+		$events = Event::get_by_feed_id( $feed_id, $start, $end );
 
 		$response = [];
 
 		foreach ($events as $event) {
 			$response[] = [
+                'id' => $event->ID,
 				'title' => $event->post_title,
 				'start' => get_post_meta( $event->ID, 'ifs_event_start', true ),
 				'end' => get_post_meta( $event->ID, 'ifs_event_end', true ),

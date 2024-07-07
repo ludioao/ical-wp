@@ -1,0 +1,1 @@
+{"version":3,"file":"calendar/style-view.css","mappings":";;;AAEA;EACE;AAAF;;AAGE;EACE;AAAJ,C","sources":["webpack://google-calendar-sync/./blocks/src/calendar/style.scss"],"sourcesContent":["@import '@event-calendar/core/index.css';\n\nbody {\n  background: red !important;\n}\n.ics-calendar {\n  .ec-event-title {\n    font-size: 1rem;\n  }\n}"],"names":[],"sourceRoot":""}

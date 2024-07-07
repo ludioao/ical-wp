@@ -1,1 +1,0 @@
-{"version":3,"file":"calendar/style-index.css","mappings":";;;AAEA;EACI;AAAJ,C","sources":["webpack://google-calendar-sync/./blocks/src/calendar/style.scss"],"sourcesContent":["@import '@event-calendar/core/index.css';\n\n.colur{\n    color: red;\n}"],"names":[],"sourceRoot":""}

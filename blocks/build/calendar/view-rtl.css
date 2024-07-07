@@ -113,14 +113,14 @@
   border: none;
 }
 .ec-timeline .ec-day-head {
-  border-style: none none none solid;
+  border-style: none solid none none;
 }
 .ec-timeline .ec-times {
   display: flex;
   border-style: solid none none;
 }
 .ec-timeline .ec-time {
-  border-left: 1px solid var(--ec-border-color);
+  border-right: 1px solid var(--ec-border-color);
   box-sizing: border-box;
   min-height: 24px;
   overflow: hidden;
@@ -147,13 +147,13 @@
   content: "";
   position: absolute;
   height: 100%;
-  border-left: 1px solid var(--ec-border-color);
+  border-right: 1px solid var(--ec-border-color);
   pointer-events: none;
 }
 .ec-timeline .ec-sidebar {
   padding: 0;
   border: 1px solid var(--ec-border-color);
-  border-right-style: none;
+  border-left-style: none;
 }
 .ec-timeline .ec-sidebar .ec-sidebar-title {
   flex-shrink: 0;
@@ -187,8 +187,8 @@
   top: 0;
 }
 .ec-time-grid .ec-body .ec-resizer {
-  left: 0;
   right: 0;
+  left: 0;
   bottom: 0;
   height: 50%;
   max-height: 8px;
@@ -202,7 +202,7 @@
   position: relative;
   line-height: 24px;
   top: -12px;
-  text-align: right;
+  text-align: left;
 }
 .ec-time-grid .ec-header .ec-time,
 .ec-time-grid .ec-all-day .ec-time {
@@ -231,7 +231,7 @@
   visibility: hidden;
   overflow-y: hidden;
   height: 0;
-  text-align: right;
+  text-align: left;
 }
 .ec-time-grid .ec-all-day .ec-sidebar-title {
   visibility: visible;
@@ -296,7 +296,7 @@
   margin-bottom: 0.5em;
 }
 .ec-toolbar > * > *:not(:last-child) {
-  margin-right: 0.75em;
+  margin-left: 0.75em;
 }
 
 .ec-title {
@@ -326,13 +326,13 @@
   display: inline-flex;
 }
 .ec-button-group .ec-button:not(:first-child) {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  margin-left: -1px;
-}
-.ec-button-group .ec-button:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  margin-right: -1px;
+}
+.ec-button-group .ec-button:not(:last-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .ec-icon {
@@ -345,14 +345,14 @@
   width: 0.5em;
   height: 0.5em;
   border-top: 2px solid currentcolor;
-  border-right: 2px solid currentcolor;
+  border-left: 2px solid currentcolor;
   display: inline-block;
 }
 .ec-icon.ec-prev:after {
-  transform: rotate(-135deg) translate(-2px, 2px);
+  transform: rotate(135deg) translate(2px, 2px);
 }
 .ec-icon.ec-next:after {
-  transform: rotate(45deg) translate(-2px, 2px);
+  transform: rotate(-45deg) translate(2px, 2px);
 }
 
 /* Header */
@@ -416,7 +416,7 @@
   flex: 0 0 auto;
   width: auto;
   max-width: 100%;
-  padding: 0 4px 0 8px;
+  padding: 0 8px 0 4px;
   display: flex;
   flex-direction: column;
 }
@@ -455,7 +455,7 @@
 }
 
 .ec-day {
-  border-style: none none none solid;
+  border-style: none solid none none;
 }
 .ec-day.ec-today {
   background-color: var(--ec-today-bg-color);
@@ -471,7 +471,7 @@
   min-height: 0;
 }
 .ec-day-grid .ec-day:first-child {
-  border-left: none;
+  border-right: none;
 }
 .ec-day.ec-other-month .ec-day-head {
   opacity: 0.3;
@@ -483,7 +483,7 @@
 .ec-day-grid .ec-day-head {
   display: block;
   border: none;
-  text-align: right;
+  text-align: left;
   padding: 4px 4px 3px;
 }
 .ec-day-grid .ec-day-foot {
@@ -509,7 +509,7 @@
   border-top: none;
 }
 .ec-list .ec-day-side {
-  float: right;
+  float: left;
 }
 .ec-list .ec-no-events {
   text-align: center;
@@ -517,7 +517,7 @@
 }
 
 .ec-events {
-  margin: 0 6px 0 0;
+  margin: 0 0 0 6px;
 }
 .ec-time-grid .ec-events, .ec-events.ec-preview {
   position: relative;
@@ -581,7 +581,7 @@
 .ec-event-tag {
   width: 4px;
   border-radius: 2px;
-  margin-right: 8px;
+  margin-left: 8px;
 }
 
 .ec-event-time {
@@ -591,7 +591,7 @@
   flex-shrink: 0;
 }
 .ec-day-grid .ec-event-time, .ec-timeline .ec-event-time {
-  margin: 0 3px 0 0;
+  margin: 0 0 0 3px;
   max-width: 100%;
   text-overflow: ellipsis;
 }
@@ -655,7 +655,7 @@
   box-shadow: 0 1px 3px 0 hsla(var(--ec-hs), 50%, 0.15), 0 4px 8px 3px hsla(var(--ec-hs), 50%, 0.15);
 }
 .ec-popup .ec-day-head {
-  text-align: left;
+  text-align: right;
   display: flex;
   justify-content: space-between;
 }
@@ -674,7 +674,7 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  margin-left: -6.5px;
+  margin-right: -6.5px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -706,7 +706,7 @@
 }
 .ec-day-grid .ec-resizer, .ec-all-day .ec-resizer, .ec-timeline .ec-resizer {
   top: 0;
-  right: 0;
+  left: 0;
   bottom: 0;
   width: 50%;
   max-width: 8px;
@@ -724,13 +724,3 @@
 .ec-resizing-x {
   cursor: ew-resize !important;
 }
-/*!************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/@wordpress/scripts/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[6].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[6].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[6].use[3]!./blocks/src/calendar/editor.scss ***!
-  \************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/**
- * The following styles get applied inside the editor only.
- *
- * Replace them with your own styles or remove the file completely.
- */
-
-/*# sourceMappingURL=index.css.map*/

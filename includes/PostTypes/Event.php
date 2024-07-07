@@ -168,19 +168,38 @@ class Event extends PostTypeBase {
 
 	}
 
-	public static function get_by_feed_id( $feed_id ) {
-		$posts = get_posts( array(
-			'post_type' => 'ifs_event',
-			'posts_per_page' => -1,
-			'meta_query' => array(
-				array(
-					'key' => 'ifs_event_feed_id',
-					'value' => $feed_id,
-				),
-			),
-		) );
+	public static function get_by_feed_id( $feed_id, $start = null, $end = null )
+    {
+        $args = [
+            'post_type'      => 'ifs_event',
+            'posts_per_page' => -1,
+            'meta_query'     => [
+                [
+                    'key'   => 'ifs_event_feed_id',
+                    'value' => $feed_id,
+                ],
+            ],
+        ];
 
-		return $posts;
-	}
+        if ($start) {
+            $args['meta_query'][] = [
+                'key'     => 'ifs_event_start',
+                'value'   => $start,
+                'compare' => '>=',
+                'type'    => 'DATETIME',
+            ];
+        }
+
+        if ($end) {
+            $args['meta_query'][] = [
+                'key'     => 'ifs_event_end',
+                'value'   => $end,
+                'compare' => '<=',
+                'type'    => 'DATETIME',
+            ];
+        }
+
+        return get_posts($args);
+    }
 
 }

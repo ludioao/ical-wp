@@ -33,6 +33,17 @@ class ICal {
 		$this->url = $url;
 	}
 
+    /**
+     * Transform date
+     *
+     * @param $date
+     *
+     * @return string
+     */
+    protected function transform_date($date) {
+        return date('Y-m-d H:i:s', strtotime($date));
+    }
+
 	/**
 	 * Get events
 	 *
@@ -79,8 +90,8 @@ class ICal {
 					'ifs_event_id' => (string) $event->UID, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
 					'title' => (string) $event->SUMMARY, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
 					'post_content' => (string) $event->DESCRIPTION, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
-					'ifs_event_start' => (string) $event->DTSTART, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
-					'ifs_event_end' => $dt_end, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
+					'ifs_event_start' => $this->transform_date( (string) $event->DTSTART ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
+					'ifs_event_end' => $this->transform_date( $dt_end ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
 					'ifs_event_location' => (string) $event->LOCATION, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
 					'ifs_event_organizer' => (string) $event->ORGANIZER, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Sabre\VObject do not follow snake case
 				);
